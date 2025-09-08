@@ -7,7 +7,7 @@ const app = express();
 connectDB();
 
 app.use(cors({
-  origin: "https://keeper-app-beryl-sigma.vercel.app/" // replace with your frontend URL
+  origin: "https://keeper-app-beryl-sigma.vercel.app" // replace with your frontend URL
 }));
 app.use(express.json());
 
