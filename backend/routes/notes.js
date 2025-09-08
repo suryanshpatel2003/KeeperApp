@@ -56,25 +56,43 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // DELETE
+// DELETE
 router.delete('/:id', auth, async (req, res) => {
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ msg: 'Invalid note ID' });
+    const noteId = req.params.id;
+    console.log("Delete request for note:", noteId, "by user:", req.user?.id);
+
+    // Validate ObjectId first
+    if (!noteId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ msg: 'Invalid note ID format' });
     }
 
-    let note = await Note.findById(req.params.id);
-    if (!note) return res.status(404).json({ msg: 'Note not found' });
+    const note = await Note.findById(noteId);
+
+    if (!note) {
+      return res.status(404).json({ msg: 'Note not found' });
+    }
+
+    if (!note.user) {
+      return res.status(400).json({ msg: 'Note has no owner (invalid data)' });
+    }
 
     if (note.user.toString() !== req.user.id) {
-      return res.status(401).json({ msg: 'Not authorized' });
+      return res.status(401).json({ msg: 'Not authorized to delete this note' });
     }
 
-    await Note.findByIdAndRemove(req.params.id);
-    res.json({ msg: 'Note removed' });
+    await note.deleteOne();  
+    return res.json({ msg: 'Note removed successfully' });
+
   } catch (err) {
-    console.error('Delete Error:', err.message);
-    res.status(500).send('Server error');
+    console.error("Delete error:", err);
+    if (err.kind === 'ObjectId') {
+      return res.status(400).json({ msg: 'Invalid note ID' });
+    }
+    return res.status(500).json({ msg: 'Server error', error: err.message });
   }
 });
+
+
 
 module.exports = router;
