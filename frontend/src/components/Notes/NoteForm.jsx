@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 
 export default function NoteForm({ currentNote, clearCurrent, onSave }) {
   const [note, setNote] = useState({ title: '', content: '' })
+  const [loading, setLoading] = useState(false) // ✅ track button state
 
   useEffect(() => {
     if (currentNote) {
@@ -21,14 +22,13 @@ export default function NoteForm({ currentNote, clearCurrent, onSave }) {
     if (!note.title.trim() || !note.content.trim()) {
       return toast.error('Title and content are required')
     }
+    setLoading(true) // ✅ disable button
     try {
       if (currentNote) {
-        // ✅ Update note
         const res = await API.put(`/api/notes/${currentNote._id}`, note)
         toast.success('Note updated')
         onSave(res.data)
       } else {
-        // ✅ Create note
         const res = await API.post('/api/notes', note)
         toast.success('Note created')
         onSave(res.data)
@@ -37,6 +37,8 @@ export default function NoteForm({ currentNote, clearCurrent, onSave }) {
     } catch (err) {
       console.error(err)
       toast.error('Error saving note')
+    } finally {
+      setLoading(false) // ✅ re-enable button
     }
   }
 
@@ -60,14 +62,24 @@ export default function NoteForm({ currentNote, clearCurrent, onSave }) {
             rows="4"
             placeholder="Content"
           />
-          <button className="btn btn-success me-2">
-            {currentNote ? 'Update' : 'Create'}
+          <button
+            className="btn btn-success me-2"
+            disabled={loading} // ✅ disable while saving
+          >
+            {loading ? (
+              <span>
+                <i className="fa fa-spinner fa-spin me-2"></i> Saving...
+              </span>
+            ) : (
+              currentNote ? 'Update' : 'Create'
+            )}
           </button>
           {currentNote && (
             <button
               type="button"
               className="btn btn-secondary"
               onClick={clearCurrent}
+              disabled={loading} // disable cancel too while saving
             >
               Cancel
             </button>
