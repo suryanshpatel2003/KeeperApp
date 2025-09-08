@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import API from '../../api'; // Axios instance with VITE_API_URL
+import API from '../../api'; // Axios instance
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 
@@ -8,11 +8,9 @@ export default function Register() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const navigate = useNavigate();
 
-  // Update form fields
   const onChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  // Handle form submission
   const onSubmit = async (e) => {
     e.preventDefault();
 
@@ -21,11 +19,10 @@ export default function Register() {
     }
 
     try {
-      // Updated to match backend route
-      const res = await API.post('/api/auth/register', form);
+      const res = await API.post('/api/auth/register', form); // matches deployed backend
       localStorage.setItem('token', res.data.token);
       toast.success('Registered successfully');
-      navigate('/notes'); // Redirect after successful registration
+      navigate('/notes');
     } catch (err) {
       const msg = err.response?.data?.errors?.[0]?.msg || 'Registration failed';
       toast.error(msg);
@@ -48,7 +45,6 @@ export default function Register() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
-        {/* Title */}
         <motion.h3
           className="text-center mb-4 fw-bold text-primary"
           initial={{ scale: 0.8 }}
@@ -58,7 +54,6 @@ export default function Register() {
           <i className="fa fa-user-plus me-2"></i> Register
         </motion.h3>
 
-        {/* Form */}
         <form onSubmit={onSubmit}>
           <div className="mb-3">
             <label className="form-label">Name</label>
@@ -120,7 +115,6 @@ export default function Register() {
           </motion.button>
         </form>
 
-        {/* Footer with React Router Link */}
         <p className="text-center mt-3 text-muted">
           Already have an account?{' '}
           <Link to="/login" className="text-decoration-none fw-bold">
