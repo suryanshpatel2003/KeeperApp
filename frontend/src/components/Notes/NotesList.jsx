@@ -45,8 +45,9 @@ export default function NotesList() {
       await API.delete(`/api/notes/${id}`)
       setNotes((prev) => prev.filter((n) => n._id !== id))
       toast.success('Note deleted')
-    } catch {
-      toast.error('Delete failed')
+    } catch (err) {
+      const msg = err.response?.data?.msg || 'Delete failed';
+      toast.error(msg);
     }
   }
 
