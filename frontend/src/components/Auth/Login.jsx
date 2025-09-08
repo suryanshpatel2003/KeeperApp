@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import API from '../../api'
 import { toast } from 'react-toastify'
 import { motion } from 'framer-motion'
@@ -14,7 +14,7 @@ export default function Login() {
     e.preventDefault()
     if (!form.email || !form.password) return toast.error('Fill email and password')
     try {
-      const res = await API.post('/auth/login', form)
+      const res = await API.post('/api/auth/login', form)  // ✅ fixed endpoint
       localStorage.setItem('token', res.data.token)
       toast.success('Login successful')
       navigate('/notes')
@@ -90,7 +90,10 @@ export default function Login() {
 
         {/* Footer */}
         <p className="text-center mt-3 text-muted">
-          Don’t have an account? <a href="/register" className="text-decoration-none fw-bold">Register</a>
+          Don’t have an account?{' '}
+          <Link to="/register" className="text-decoration-none fw-bold">
+            Register
+          </Link>
         </p>
       </motion.div>
     </div>
